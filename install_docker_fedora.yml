@@ -1,0 +1,43 @@
+---
+- name: Instalando o docker
+  gather_facts: No
+  hosts: localhost
+
+  tasks:
+    - name: Instalando yum utils
+      yum:
+        name: yum-utils
+        state: latest
+
+    - name: Instalando device-mapper-persistent-data
+      yum:
+        name: device-mapper-persistent-data
+        state: latest
+
+    - name: Instalando lvm2
+      yum:
+        name: lvm2
+        state: latest
+
+    - name: Adicionando Docker Fedora repo
+      get_url:
+        url: https://download.docker.com/linux/fedora/docker-ce.repo
+        dest: /etc/yum.repos.d/docker-ce.repo
+      become: yes
+
+    - name: Instalando o Docker
+      package:
+        name: "{{ item }}"
+        state: latest
+      with_items:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+      become: yes
+
+    - name: habilitando e iniciando o serviço do docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+      become: yes
